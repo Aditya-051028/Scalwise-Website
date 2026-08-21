@@ -33,6 +33,19 @@ export const Leads: CollectionConfig = {
       ],
     },
     {
+      name: "interestedServices",
+      type: "select",
+      hasMany: true,
+      options: [
+        "Performance Marketing",
+        "SEO & Local",
+        "Web & Landing Pages",
+        "Content & Social",
+        "Automation & CRO",
+        "Brand & Strategy",
+      ],
+    },
+    {
       name: "monthlyAdBudget",
       type: "select",
       options: [

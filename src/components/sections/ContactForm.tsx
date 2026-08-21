@@ -3,6 +3,9 @@
 import { useState, type FormEvent } from "react";
 import { GlassPanel } from "@/components/ui/GlassPanel";
 import { Button } from "@/components/ui/Button";
+import { FloatingLabelInput } from "@/components/ui/FloatingLabelInput";
+import { FloatingLabelTextarea } from "@/components/ui/FloatingLabelTextarea";
+import { FloatingLabelSelect } from "@/components/ui/FloatingLabelSelect";
 
 const BUSINESS_TYPES = [
   "D2C / Ecommerce",
@@ -25,45 +28,85 @@ const AD_BUDGETS = [
 
 const CONTACT_METHODS = ["Email", "Phone", "WhatsApp"];
 
+// Mirrors the real categories in the Services section — not generic agency options.
+const SERVICE_INTERESTS = [
+  "Performance Marketing",
+  "SEO & Local",
+  "Web & Landing Pages",
+  "Content & Social",
+  "Automation & CRO",
+  "Brand & Strategy",
+];
+
 type Status = "idle" | "submitting" | "success" | "error";
 
-const inputClass =
-  "w-full rounded-xl border border-line bg-void-3/50 px-4 py-3 text-sm text-paper placeholder:text-lavender/50 outline-none transition-colors duration-200 ease-premium focus:border-neon";
+type FormState = {
+  name: string;
+  email: string;
+  phone: string;
+  company: string;
+  businessType: string;
+  interestedServices: string[];
+  monthlyAdBudget: string;
+  message: string;
+  preferredContactMethod: string;
+};
 
-const labelClass = "mb-1.5 block font-mono text-[11px] uppercase tracking-wide text-lavender";
+const initialState: FormState = {
+  name: "",
+  email: "",
+  phone: "",
+  company: "",
+  businessType: "",
+  interestedServices: [],
+  monthlyAdBudget: "",
+  message: "",
+  preferredContactMethod: "Email",
+};
+
+const legendClass = "font-mono text-[11px] uppercase tracking-wide text-lavender";
 
 export function ContactForm() {
+  const [form, setForm] = useState<FormState>(initialState);
   const [status, setStatus] = useState<Status>("idle");
+
+  function toggleService(service: string) {
+    setForm((prev) => ({
+      ...prev,
+      interestedServices: prev.interestedServices.includes(service)
+        ? prev.interestedServices.filter((s) => s !== service)
+        : [...prev.interestedServices, service],
+    }));
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (status === "submitting") return;
     setStatus("submitting");
 
-    const form = e.currentTarget;
-    const data = new FormData(form);
-    const value = (key: string) => (data.get(key) as string) || undefined;
-
     try {
       const res = await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: value("name"),
-          email: value("email"),
-          phone: value("phone"),
-          company: value("company"),
-          businessType: value("businessType"),
-          monthlyAdBudget: value("monthlyAdBudget"),
-          message: value("message"),
-          preferredContactMethod: value("preferredContactMethod") ?? "Email",
+          name: form.name,
+          email: form.email,
+          phone: form.phone || undefined,
+          company: form.company || undefined,
+          businessType: form.businessType || undefined,
+          interestedServices: form.interestedServices.length
+            ? form.interestedServices
+            : undefined,
+          monthlyAdBudget: form.monthlyAdBudget || undefined,
+          message: form.message || undefined,
+          preferredContactMethod: form.preferredContactMethod,
         }),
       });
 
       if (!res.ok) throw new Error("Submission failed");
 
       setStatus("success");
-      form.reset();
+      setForm(initialState);
     } catch {
       setStatus("error");
     }
@@ -82,81 +125,89 @@ export function ContactForm() {
 
   return (
     <GlassPanel className="p-6 sm:p-8">
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid gap-5 sm:grid-cols-2">
-          <div>
-            <label htmlFor="name" className={labelClass}>
-              Name *
-            </label>
-            <input id="name" name="name" type="text" required className={inputClass} />
-          </div>
-          <div>
-            <label htmlFor="email" className={labelClass}>
-              Email *
-            </label>
-            <input id="email" name="email" type="email" required className={inputClass} />
-          </div>
+          <FloatingLabelInput
+            label="Your name *"
+            value={form.name}
+            onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+            required
+          />
+          <FloatingLabelInput
+            label="Email *"
+            type="email"
+            value={form.email}
+            onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+            required
+          />
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
-          <div>
-            <label htmlFor="phone" className={labelClass}>
-              Phone
-            </label>
-            <input id="phone" name="phone" type="tel" className={inputClass} />
-          </div>
-          <div>
-            <label htmlFor="company" className={labelClass}>
-              Company
-            </label>
-            <input id="company" name="company" type="text" className={inputClass} />
-          </div>
+          <FloatingLabelInput
+            label="Phone"
+            type="tel"
+            value={form.phone}
+            onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+          />
+          <FloatingLabelInput
+            label="Company"
+            value={form.company}
+            onChange={(e) => setForm((f) => ({ ...f, company: e.target.value }))}
+          />
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
-          <div>
-            <label htmlFor="businessType" className={labelClass}>
-              Business type
-            </label>
-            <select id="businessType" name="businessType" className={inputClass} defaultValue="">
-              <option value="">Select one</option>
-              {BUSINESS_TYPES.map((b) => (
-                <option key={b} value={b}>
-                  {b}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="monthlyAdBudget" className={labelClass}>
-              Monthly ad budget
-            </label>
-            <select
-              id="monthlyAdBudget"
-              name="monthlyAdBudget"
-              className={inputClass}
-              defaultValue=""
-            >
-              <option value="">Select one</option>
-              {AD_BUDGETS.map((b) => (
-                <option key={b} value={b}>
-                  {b}
-                </option>
-              ))}
-            </select>
-          </div>
+          <FloatingLabelSelect
+            label="Business type"
+            value={form.businessType}
+            onChange={(e) => setForm((f) => ({ ...f, businessType: e.target.value }))}
+            options={BUSINESS_TYPES}
+          />
+          <FloatingLabelSelect
+            label="Monthly ad budget"
+            value={form.monthlyAdBudget}
+            onChange={(e) => setForm((f) => ({ ...f, monthlyAdBudget: e.target.value }))}
+            options={AD_BUDGETS}
+          />
         </div>
 
         <fieldset>
-          <legend className={labelClass}>Preferred contact method</legend>
-          <div className="flex gap-5">
-            {CONTACT_METHODS.map((method, i) => (
+          <legend className={legendClass}>I&rsquo;m interested in</legend>
+          <div className="mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+            {SERVICE_INTERESTS.map((service) => {
+              const checked = form.interestedServices.includes(service);
+              return (
+                <label
+                  key={service}
+                  className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2.5 text-xs leading-snug transition-colors duration-200 ease-premium ${
+                    checked
+                      ? "border-neon/50 bg-neon/10 text-paper"
+                      : "border-line text-lavender hover:border-purple-light/50"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => toggleService(service)}
+                    className="accent-neon"
+                  />
+                  {service}
+                </label>
+              );
+            })}
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend className={legendClass}>Preferred contact method</legend>
+          <div className="mt-3 flex gap-5">
+            {CONTACT_METHODS.map((method) => (
               <label key={method} className="flex items-center gap-2 text-sm text-paper">
                 <input
                   type="radio"
                   name="preferredContactMethod"
-                  value={method}
-                  defaultChecked={i === 0}
+                  checked={form.preferredContactMethod === method}
+                  onChange={() => setForm((f) => ({ ...f, preferredContactMethod: method }))}
                   className="accent-neon"
                 />
                 {method}
@@ -165,12 +216,11 @@ export function ContactForm() {
           </div>
         </fieldset>
 
-        <div>
-          <label htmlFor="message" className={labelClass}>
-            Message
-          </label>
-          <textarea id="message" name="message" rows={4} className={inputClass} />
-        </div>
+        <FloatingLabelTextarea
+          label="Briefly describe your project"
+          value={form.message}
+          onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
+        />
 
         {status === "error" ? (
           <p role="alert" className="text-sm text-[#FF8A8A]">

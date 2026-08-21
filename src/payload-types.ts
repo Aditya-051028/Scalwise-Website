@@ -227,6 +227,16 @@ export interface Lead {
         | 'Other'
       )
     | null;
+  interestedServices?:
+    | (
+        | 'Performance Marketing'
+        | 'SEO & Local'
+        | 'Web & Landing Pages'
+        | 'Content & Social'
+        | 'Automation & CRO'
+        | 'Brand & Strategy'
+      )[]
+    | null;
   monthlyAdBudget?:
     ('Not yet spending' | 'Under ₹50,000' | '₹50,000 – ₹2,00,000' | '₹2,00,000 – ₹5,00,000' | '₹5,00,000+') | null;
   message?: string | null;
@@ -631,6 +641,7 @@ export interface LeadsSelect<T extends boolean = true> {
   phone?: T;
   company?: T;
   businessType?: T;
+  interestedServices?: T;
   monthlyAdBudget?: T;
   message?: T;
   preferredContactMethod?: T;
