@@ -138,12 +138,13 @@ function Scene() {
   );
 }
 
-export function HeroScene() {
+export function HeroScene({ active = true }: { active?: boolean }) {
   return (
     <Canvas
       dpr={[1, 1.6]}
       gl={{ alpha: true, antialias: true }}
       camera={{ position: [0, 0.6, 7.5], fov: 32 }}
+      frameloop={active ? "always" : "never"}
       className="!absolute inset-0"
     >
       <Scene />

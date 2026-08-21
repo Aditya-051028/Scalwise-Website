@@ -439,21 +439,7 @@ export interface BlogPost {
 export interface Faq {
   id: number;
   question: string;
-  answer: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
+  answer: string;
   category?: string | null;
   order?: number | null;
   updatedAt: string;

@@ -1,6 +1,17 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { Divider } from "@/components/ui/Divider";
 import { Hero } from "@/components/sections/Hero";
+import { TrustStrip } from "@/components/sections/TrustStrip";
+import { Services } from "@/components/sections/Services";
+import { Industries } from "@/components/sections/Industries";
+import { Process } from "@/components/sections/Process";
+import { Proof } from "@/components/sections/Proof";
+import { Testimonials } from "@/components/sections/Testimonials";
+import { WhyScalwise } from "@/components/sections/WhyScalwise";
+import { PricingSection } from "@/components/sections/PricingSection";
+import { FAQ } from "@/components/sections/FAQ";
+import { ContactSection } from "@/components/sections/ContactSection";
 
 export default function Home() {
   return (
@@ -8,6 +19,18 @@ export default function Home() {
       <Header />
       <main className="flex-1">
         <Hero />
+        <TrustStrip />
+        <Services />
+        <Industries />
+        <Process />
+        <Divider />
+        <Proof />
+        <Testimonials />
+        <WhyScalwise />
+        <PricingSection />
+        <Divider flip />
+        <FAQ />
+        <ContactSection />
       </main>
       <Footer />
     </>
