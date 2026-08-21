@@ -79,6 +79,55 @@ h3 {
   letter-spacing: 0.02em;
 }
 
+/* Glow-on-hover for primary CTAs — adapted from a rotating-hue card effect,
+   constrained to the brand's purple/violet/neon range instead of a full
+   360° rainbow, and scaled down to sit behind a pill button rather than a
+   480px card. */
+@property --glow-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes btn-glow-spin {
+  to {
+    --glow-angle: 360deg;
+  }
+}
+
+.btn-glow {
+  position: relative;
+  isolation: isolate;
+}
+
+.btn-glow::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  z-index: -1;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--glow-angle),
+    var(--color-purple),
+    var(--color-purple-light),
+    var(--color-neon),
+    var(--color-purple-light),
+    var(--color-purple)
+  );
+  filter: blur(10px);
+  opacity: 0;
+  animation: btn-glow-spin 3.5s linear infinite;
+  transition:
+    opacity 0.3s var(--ease-premium),
+    filter 0.3s var(--ease-premium);
+}
+
+.btn-glow:hover::before,
+.btn-glow:focus-visible::before {
+  opacity: 0.8;
+  filter: blur(14px);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

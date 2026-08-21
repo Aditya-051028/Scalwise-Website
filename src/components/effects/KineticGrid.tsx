@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import { useInView } from "@/lib/hooks/use-in-view";
 import { usePrefersReducedMotion } from "@/lib/hooks/use-media-query";
 
 interface Point {
@@ -21,11 +20,12 @@ const INFLUENCE_RADIUS = 260;
 const MAX_WARP = 24;
 const DOT_SPACING = 30;
 const LERP_SPEED = 0.08;
+const SETTLE_EPSILON = 0.4; // below this, mouse lerp is considered "arrived"
 
 // Scalwise brand tokens, not the source component's blue/monochrome themes
-const LINE_BASE = { r: 247, g: 244, b: 252, a: 0.07 };
+const LINE_BASE = { r: 247, g: 244, b: 252, a: 0.06 };
 const LINE_ACTIVE = { r: 144, g: 97, b: 249, a: 0.85 };
-const NODE_BASE = { r: 247, g: 244, b: 252, a: 0.15 };
+const NODE_BASE = { r: 247, g: 244, b: 252, a: 0.13 };
 const NODE_ACTIVE = { r: 144, g: 97, b: 249, a: 1 };
 const GLOW_RGB = "144,97,249"; // purple-light
 const RIPPLE_RGB = "212,255,61"; // neon volt — reserved for the click ripple only
@@ -45,22 +45,17 @@ function lerpColor(base: typeof LINE_BASE, active: typeof LINE_BASE, t: number) 
   return `rgba(${r},${g},${b},${a.toFixed(3)})`;
 }
 
-/** Cursor-warped grid backdrop, scoped to its wrapping container (not the full viewport).
- *  Pauses off-screen and is skipped entirely under prefers-reduced-motion. */
+/** Cursor-warped grid, pinned to the viewport for the whole page (not one section).
+ *  Pauses while the tab is backgrounded, skips redraws once fully settled and idle,
+ *  and is omitted entirely under prefers-reduced-motion. */
 export function KineticGrid({ className = "" }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const wrapperRef = useRef<HTMLDivElement | null>(null);
   const mouseRef = useRef<Point>({ x: -9999, y: -9999 });
   const targetMouseRef = useRef<Point>({ x: -9999, y: -9999 });
   const ripplesRef = useRef<Ripple[]>([]);
   const rafRef = useRef<number>(0);
   const sizeRef = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
-
-  const { ref: inViewRef, inView } = useInView<HTMLDivElement>({ threshold: 0.05 });
-  const inViewValueRef = useRef(inView);
-  useEffect(() => {
-    inViewValueRef.current = inView;
-  }, [inView]);
+  const settledRef = useRef(false);
 
   const reducedMotion = usePrefersReducedMotion();
 
@@ -133,7 +128,7 @@ export function KineticGrid({ className = "" }: { className?: string }) {
 
       ctx.clearRect(0, 0, W, H);
 
-      ctx.fillStyle = "rgba(247,244,252,0.05)";
+      ctx.fillStyle = "rgba(247,244,252,0.045)";
       for (let x = DOT_SPACING / 2; x < W; x += DOT_SPACING) {
         for (let y = DOT_SPACING / 2; y < H; y += DOT_SPACING) {
           ctx.beginPath();
@@ -236,47 +231,52 @@ export function KineticGrid({ className = "" }: { className?: string }) {
   useEffect(() => {
     if (reducedMotion) return;
     const canvas = canvasRef.current;
-    const wrapper = wrapperRef.current;
-    if (!canvas || !wrapper) return;
+    if (!canvas) return;
 
     function animate(now: number) {
-      if (inViewValueRef.current) {
+      if (!document.hidden) {
         const m = mouseRef.current;
         const t = targetMouseRef.current;
-        m.x = lerpN(m.x, t.x, LERP_SPEED);
-        m.y = lerpN(m.y, t.y, LERP_SPEED);
-        draw(now);
+        const dx = t.x - m.x;
+        const dy = t.y - m.y;
+        const arrived = Math.abs(dx) < SETTLE_EPSILON && Math.abs(dy) < SETTLE_EPSILON;
+        const hasRipples = ripplesRef.current.length > 0;
+
+        if (!arrived || hasRipples || !settledRef.current) {
+          m.x = lerpN(m.x, t.x, LERP_SPEED);
+          m.y = lerpN(m.y, t.y, LERP_SPEED);
+          draw(now);
+          settledRef.current = arrived && !hasRipples;
+        }
       }
       rafRef.current = requestAnimationFrame(animate);
     }
 
     const setSize = () => {
-      const rect = wrapper.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      canvas.style.width = `${rect.width}px`;
-      canvas.style.height = `${rect.height}px`;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
       const ctx = canvas.getContext("2d");
       ctx?.setTransform(dpr, 0, 0, dpr, 0, 0);
-      sizeRef.current = { w: rect.width, h: rect.height };
+      sizeRef.current = { w, h };
+      settledRef.current = false; // force a redraw at the new size
     };
 
     setSize();
-    const resizeObserver = new ResizeObserver(setSize);
-    resizeObserver.observe(wrapper);
+    window.addEventListener("resize", setSize);
 
     const onMouseMove = (e: MouseEvent) => {
-      const rect = wrapper.getBoundingClientRect();
-      targetMouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+      targetMouseRef.current = { x: e.clientX, y: e.clientY };
+      settledRef.current = false;
     };
 
     const onClick = (e: MouseEvent) => {
-      const rect = wrapper.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      if (x < 0 || y < 0 || x > rect.width || y > rect.height) return;
-      ripplesRef.current.push({ x, y, radius: 0, opacity: 1, born: performance.now() });
+      ripplesRef.current.push({ x: e.clientX, y: e.clientY, radius: 0, opacity: 1, born: performance.now() });
+      settledRef.current = false;
     };
 
     window.addEventListener("mousemove", onMouseMove);
@@ -284,7 +284,7 @@ export function KineticGrid({ className = "" }: { className?: string }) {
     rafRef.current = requestAnimationFrame(animate);
 
     return () => {
-      resizeObserver.disconnect();
+      window.removeEventListener("resize", setSize);
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("click", onClick);
       cancelAnimationFrame(rafRef.current);
@@ -294,15 +294,10 @@ export function KineticGrid({ className = "" }: { className?: string }) {
   if (reducedMotion) return null;
 
   return (
-    <div
-      ref={(node) => {
-        wrapperRef.current = node;
-        inViewRef.current = node;
-      }}
+    <canvas
+      ref={canvasRef}
       aria-hidden
-      className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}
-    >
-      <canvas ref={canvasRef} className="absolute inset-0" />
-    </div>
+      className={`pointer-events-none fixed inset-0 ${className}`}
+    />
   );
 }

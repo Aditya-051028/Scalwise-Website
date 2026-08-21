@@ -1,6 +1,7 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Divider } from "@/components/ui/Divider";
+import { KineticGrid } from "@/components/effects/KineticGrid";
 import { Hero } from "@/components/sections/Hero";
 import { TrustStrip } from "@/components/sections/TrustStrip";
 import { Services } from "@/components/sections/Services";
@@ -16,23 +17,26 @@ import { ContactSection } from "@/components/sections/ContactSection";
 export default function Home() {
   return (
     <>
+      <KineticGrid className="z-0" />
       <Header />
-      <main className="flex-1">
-        <Hero />
-        <TrustStrip />
-        <Services />
-        <Industries />
-        <Process />
-        <Divider />
-        <Proof />
-        <Testimonials />
-        <WhyScalwise />
-        <PricingSection />
-        <Divider flip />
-        <FAQ />
-        <ContactSection />
-      </main>
-      <Footer />
+      <div className="relative z-10 flex flex-1 flex-col">
+        <main className="flex-1">
+          <Hero />
+          <TrustStrip />
+          <Services />
+          <Industries />
+          <Process />
+          <Divider />
+          <Proof />
+          <Testimonials />
+          <WhyScalwise />
+          <PricingSection />
+          <Divider flip />
+          <FAQ />
+          <ContactSection />
+        </main>
+        <Footer />
+      </div>
     </>
   );
 }
