@@ -1,0 +1,24 @@
+<svg width="600" height="600" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="barGrad3" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#D8CBFB"/>
+    </linearGradient>
+    <filter id="neonGlow3" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="4.6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <linearGradient id="bgGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1B0733"/>
+      <stop offset="100%" stop-color="#0F0420"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="600" height="600" rx="120" fill="url(#bgGrad3)"/>
+  <g transform="translate(190,205) scale(1.0)">
+    <polygon points="20,170 54,170 72,115 38,115" fill="url(#barGrad3)" opacity="0.55"/>
+    <polygon points="80,170 114,170 132,70 98,70" fill="url(#barGrad3)" opacity="0.78"/>
+    <polygon points="140,170 174,170 192,20 158,20" fill="url(#barGrad3)"/>
+    <polyline points="2,188 92,128 216,6" fill="none" stroke="#D4FF3D" stroke-width="15"
+              stroke-linecap="round" stroke-linejoin="round" filter="url(#neonGlow3)"/>
+  </g>
+</svg>
