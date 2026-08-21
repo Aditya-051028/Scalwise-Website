@@ -113,13 +113,14 @@ function Scene() {
   useFrame((state, delta) => {
     progress.current = Math.min(progress.current + delta / 1.4, 1);
 
-    pointer.current.x = THREE.MathUtils.lerp(pointer.current.x, state.pointer.x, 0.04);
-    pointer.current.y = THREE.MathUtils.lerp(pointer.current.y, state.pointer.y, 0.04);
+    pointer.current.x = THREE.MathUtils.lerp(pointer.current.x, state.pointer.x, 0.06);
+    pointer.current.y = THREE.MathUtils.lerp(pointer.current.y, state.pointer.y, 0.06);
 
     if (group.current) {
       const t = state.clock.elapsedTime;
-      group.current.rotation.y = pointer.current.x * 0.18 + Math.sin(t * 0.25) * 0.03;
-      group.current.rotation.x = -pointer.current.y * 0.08 + Math.sin(t * 0.2) * 0.015;
+      // Full 360° sweep across the canvas width, cursor-driven, plus a slow idle drift
+      group.current.rotation.y = pointer.current.x * Math.PI + Math.sin(t * 0.2) * 0.04;
+      group.current.rotation.x = -pointer.current.y * 0.25 + Math.sin(t * 0.15) * 0.02;
     }
   });
 

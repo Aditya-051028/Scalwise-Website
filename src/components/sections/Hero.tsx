@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { GlassPanel } from "@/components/ui/GlassPanel";
 import { HeroSceneLoader } from "@/components/three/HeroSceneLoader";
+import { KineticGrid } from "@/components/effects/KineticGrid";
 import { fadeUp, staggerContainer } from "@/components/motion/variants";
 
 const CHIPS = [
@@ -18,7 +19,9 @@ export function Hero() {
       id="hero"
       className="relative flex min-h-svh items-center overflow-hidden px-6 pt-28 pb-16 md:px-12"
     >
-      <div className="mx-auto grid w-full max-w-7xl items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
+      <KineticGrid className="z-0" />
+
+      <div className="relative z-10 mx-auto grid w-full max-w-7xl items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
         <motion.div variants={staggerContainer(0.09, 0.1)} initial="hidden" animate="show">
           <motion.p variants={fadeUp} className="eyebrow mb-5">
             Performance Marketing · Local SEO · Content
@@ -69,7 +72,7 @@ export function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.4, duration: 0.8 }}
-        className="absolute inset-x-0 bottom-8 hidden justify-center sm:flex"
+        className="absolute inset-x-0 bottom-8 z-10 hidden justify-center sm:flex"
         aria-hidden
       >
         <div className="h-10 w-px animate-pulse bg-gradient-to-b from-transparent via-lavender/60 to-transparent" />
