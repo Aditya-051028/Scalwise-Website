@@ -1,0 +1,40 @@
+services:
+  scalwise-postgres:
+    image: postgres:17
+    container_name: scalwise-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - scalwise_postgres_data:/var/lib/postgresql/data
+    networks:
+      - n8n_default
+
+  scalwise-app:
+    build: .
+    container_name: scalwise-app
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@scalwise-postgres:5432/${POSTGRES_DB}
+      - PAYLOAD_SECRET=${PAYLOAD_SECRET}
+      - NODE_ENV=production
+    volumes:
+      - scalwise_media:/app/media
+    depends_on:
+      - scalwise-postgres
+    networks:
+      - n8n_default
+
+# This app is deployed alongside an existing n8n + Caddy setup on the same
+# VPS (see /opt/n8n). Joining n8n's compose-created network instead of
+# defining our own lets the existing Caddy container reverse-proxy to
+# scalwise-app by container name without any host-port publishing.
+networks:
+  n8n_default:
+    external: true
+
+volumes:
+  scalwise_postgres_data:
+  scalwise_media:
