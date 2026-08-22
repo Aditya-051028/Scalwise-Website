@@ -5,12 +5,17 @@ import type { Lead } from "@/payload-types";
 
 const FROM_ADDRESS = "Scalwise Media <hello@mail.scalwise.online>";
 
+let cachedClient: Resend | null | undefined;
+
 function getResendClient(): Resend | null {
+  if (cachedClient !== undefined) return cachedClient;
   if (!process.env.RESEND_API_KEY) {
     console.error("[email] RESEND_API_KEY not set, skipping email send");
+    cachedClient = null;
     return null;
   }
-  return new Resend(process.env.RESEND_API_KEY);
+  cachedClient = new Resend(process.env.RESEND_API_KEY);
+  return cachedClient;
 }
 
 export async function sendLeadConfirmation(lead: Lead): Promise<void> {

@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
-import { isLoggedIn, anyone } from "./access";
+import { isLoggedIn } from "./access";
+import { FORM_SOURCES } from "@/lib/form-sources";
 
 export const Leads: CollectionConfig = {
   slug: "leads",
@@ -8,7 +9,10 @@ export const Leads: CollectionConfig = {
     defaultColumns: ["name", "email", "company", "status", "createdAt"],
   },
   access: {
-    create: anyone,
+    // Public lead creation goes through /api/contact, which calls the Local API with
+    // overrideAccess (bypassing this check by design). Denying it here just closes off
+    // Payload's auto-generated REST endpoint, which has no rate limiting or spam checks.
+    create: isLoggedIn,
     read: isLoggedIn,
     update: isLoggedIn,
     delete: isLoggedIn,
@@ -73,7 +77,7 @@ export const Leads: CollectionConfig = {
     {
       name: "formSource",
       type: "select",
-      options: ["Contact Form", "Newsletter Footer"],
+      options: [...FORM_SOURCES],
       defaultValue: "Contact Form",
       admin: { position: "sidebar" },
     },

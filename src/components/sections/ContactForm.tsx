@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/Button";
 import { FloatingLabelInput } from "@/components/ui/FloatingLabelInput";
 import { FloatingLabelTextarea } from "@/components/ui/FloatingLabelTextarea";
 import { FloatingLabelSelect } from "@/components/ui/FloatingLabelSelect";
+import { HoneypotField } from "@/components/ui/HoneypotField";
+import { useHoneypot } from "@/lib/hooks/use-honeypot";
+import { CONTACT_FORM_SOURCE } from "@/lib/form-sources";
 
 const BUSINESS_TYPES = [
   "D2C / Ecommerce",
@@ -50,7 +53,6 @@ type FormState = {
   monthlyAdBudget: string;
   message: string;
   preferredContactMethod: string;
-  website: string;
 };
 
 const initialState: FormState = {
@@ -63,7 +65,6 @@ const initialState: FormState = {
   monthlyAdBudget: "",
   message: "",
   preferredContactMethod: "Email",
-  website: "",
 };
 
 const legendClass = "font-mono text-[11px] uppercase tracking-wide text-lavender";
@@ -71,7 +72,7 @@ const legendClass = "font-mono text-[11px] uppercase tracking-wide text-lavender
 export function ContactForm() {
   const [form, setForm] = useState<FormState>(initialState);
   const [status, setStatus] = useState<Status>("idle");
-  const [formRenderedAt] = useState(() => Date.now());
+  const { website, setWebsite, formRenderedAt } = useHoneypot();
 
   function toggleService(service: string) {
     setForm((prev) => ({
@@ -103,9 +104,9 @@ export function ContactForm() {
           monthlyAdBudget: form.monthlyAdBudget || undefined,
           message: form.message || undefined,
           preferredContactMethod: form.preferredContactMethod,
-          website: form.website,
+          website,
           formRenderedAt,
-          formSource: "Contact Form",
+          formSource: CONTACT_FORM_SOURCE,
         }),
       });
 
@@ -132,16 +133,7 @@ export function ContactForm() {
   return (
     <GlassPanel className="p-6 sm:p-8">
       <form onSubmit={handleSubmit} className="space-y-6">
-        <input
-          type="text"
-          name="website"
-          value={form.website}
-          onChange={(e) => setForm((f) => ({ ...f, website: e.target.value }))}
-          tabIndex={-1}
-          autoComplete="off"
-          aria-hidden="true"
-          style={{ position: "absolute", left: "-9999px", top: "-9999px" }}
-        />
+        <HoneypotField value={website} onChange={setWebsite} />
         <div className="grid gap-5 sm:grid-cols-2">
           <FloatingLabelInput
             label="Your name *"

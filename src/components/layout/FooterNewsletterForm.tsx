@@ -1,17 +1,19 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { HoneypotField } from "@/components/ui/HoneypotField";
+import { useHoneypot } from "@/lib/hooks/use-honeypot";
+import { NEWSLETTER_FORM_SOURCE } from "@/lib/form-sources";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
 const inputClass =
   "h-10 w-full rounded-full border border-line bg-void-3/50 px-4 text-sm text-paper placeholder:text-lavender/50 outline-none transition-colors duration-200 ease-premium focus:border-neon";
 
-/** Posts to the real Leads API (tagged as a newsletter signup) — no fake form. */
+/** Posts to /api/contact (tagged as a newsletter signup) — no fake form. */
 export function FooterNewsletterForm() {
   const [status, setStatus] = useState<Status>("idle");
-  const [website, setWebsite] = useState("");
-  const [formRenderedAt] = useState(() => Date.now());
+  const { website, setWebsite, formRenderedAt } = useHoneypot();
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -32,7 +34,7 @@ export function FooterNewsletterForm() {
           preferredContactMethod: "Email",
           website,
           formRenderedAt,
-          formSource: "Newsletter Footer",
+          formSource: NEWSLETTER_FORM_SOURCE,
         }),
       });
       if (!res.ok) throw new Error("Submission failed");
@@ -49,16 +51,7 @@ export function FooterNewsletterForm() {
 
   return (
     <form onSubmit={handleSubmit} className="mt-6 flex max-w-xs gap-2">
-      <input
-        type="text"
-        name="website"
-        value={website}
-        onChange={(e) => setWebsite(e.target.value)}
-        tabIndex={-1}
-        autoComplete="off"
-        aria-hidden="true"
-        style={{ position: "absolute", left: "-9999px", top: "-9999px" }}
-      />
+      <HoneypotField value={website} onChange={setWebsite} />
       <label htmlFor="footer-newsletter-email" className="sr-only">
         Email address
       </label>
