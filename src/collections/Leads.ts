@@ -71,6 +71,13 @@ export const Leads: CollectionConfig = {
       admin: { position: "sidebar" },
     },
     {
+      name: "formSource",
+      type: "select",
+      options: ["Contact Form", "Newsletter Footer"],
+      defaultValue: "Contact Form",
+      admin: { position: "sidebar" },
+    },
+    {
       name: "source",
       type: "group",
       admin: { position: "sidebar" },

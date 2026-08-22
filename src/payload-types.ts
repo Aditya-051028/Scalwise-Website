@@ -242,6 +242,7 @@ export interface Lead {
   message?: string | null;
   preferredContactMethod?: ('Email' | 'Phone' | 'WhatsApp') | null;
   status?: ('New' | 'Contacted' | 'Qualified' | 'Won' | 'Lost') | null;
+  formSource?: ('Contact Form' | 'Newsletter Footer') | null;
   source?: {
     utmSource?: string | null;
     utmMedium?: string | null;
@@ -646,6 +647,7 @@ export interface LeadsSelect<T extends boolean = true> {
   message?: T;
   preferredContactMethod?: T;
   status?: T;
+  formSource?: T;
   source?:
     | T
     | {
