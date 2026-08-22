@@ -10,6 +10,8 @@ const inputClass =
 /** Posts to the real Leads API (tagged as a newsletter signup) — no fake form. */
 export function FooterNewsletterForm() {
   const [status, setStatus] = useState<Status>("idle");
+  const [website, setWebsite] = useState("");
+  const [formRenderedAt] = useState(() => Date.now());
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -20,7 +22,7 @@ export function FooterNewsletterForm() {
     const email = (new FormData(form).get("email") as string) || "";
 
     try {
-      const res = await fetch("/api/leads", {
+      const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -28,6 +30,9 @@ export function FooterNewsletterForm() {
           email,
           message: "Newsletter signup from footer",
           preferredContactMethod: "Email",
+          website,
+          formRenderedAt,
+          formSource: "Newsletter Footer",
         }),
       });
       if (!res.ok) throw new Error("Submission failed");
@@ -44,6 +49,16 @@ export function FooterNewsletterForm() {
 
   return (
     <form onSubmit={handleSubmit} className="mt-6 flex max-w-xs gap-2">
+      <input
+        type="text"
+        name="website"
+        value={website}
+        onChange={(e) => setWebsite(e.target.value)}
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        style={{ position: "absolute", left: "-9999px", top: "-9999px" }}
+      />
       <label htmlFor="footer-newsletter-email" className="sr-only">
         Email address
       </label>

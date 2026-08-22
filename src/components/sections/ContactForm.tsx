@@ -50,6 +50,7 @@ type FormState = {
   monthlyAdBudget: string;
   message: string;
   preferredContactMethod: string;
+  website: string;
 };
 
 const initialState: FormState = {
@@ -62,6 +63,7 @@ const initialState: FormState = {
   monthlyAdBudget: "",
   message: "",
   preferredContactMethod: "Email",
+  website: "",
 };
 
 const legendClass = "font-mono text-[11px] uppercase tracking-wide text-lavender";
@@ -69,6 +71,7 @@ const legendClass = "font-mono text-[11px] uppercase tracking-wide text-lavender
 export function ContactForm() {
   const [form, setForm] = useState<FormState>(initialState);
   const [status, setStatus] = useState<Status>("idle");
+  const [formRenderedAt] = useState(() => Date.now());
 
   function toggleService(service: string) {
     setForm((prev) => ({
@@ -85,7 +88,7 @@ export function ContactForm() {
     setStatus("submitting");
 
     try {
-      const res = await fetch("/api/leads", {
+      const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -100,6 +103,9 @@ export function ContactForm() {
           monthlyAdBudget: form.monthlyAdBudget || undefined,
           message: form.message || undefined,
           preferredContactMethod: form.preferredContactMethod,
+          website: form.website,
+          formRenderedAt,
+          formSource: "Contact Form",
         }),
       });
 
@@ -126,6 +132,16 @@ export function ContactForm() {
   return (
     <GlassPanel className="p-6 sm:p-8">
       <form onSubmit={handleSubmit} className="space-y-6">
+        <input
+          type="text"
+          name="website"
+          value={form.website}
+          onChange={(e) => setForm((f) => ({ ...f, website: e.target.value }))}
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          style={{ position: "absolute", left: "-9999px", top: "-9999px" }}
+        />
         <div className="grid gap-5 sm:grid-cols-2">
           <FloatingLabelInput
             label="Your name *"
