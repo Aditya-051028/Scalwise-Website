@@ -152,7 +152,7 @@ Run: `npx tsc --noEmit`
 Expected: no errors — confirms the import and conditional syntax are valid.
 
 Run: `npm run dev`, load `http://localhost:3000/admin`, log in, open the Media collection, and upload a small test image.
-Expected: the upload succeeds and the file appears under `public/media/` locally — confirms the empty-plugins-array path still uses local disk storage, unchanged.
+Expected: the upload succeeds and the file appears under `media/` at the repo root (verified directly: `Media.ts`'s `staticDir: "media"` resolves relative to the repo root, not under `public/`) — confirms the empty-plugins-array path still uses local disk storage, unchanged.
 
 - [ ] **Step 4: Commit**
 
