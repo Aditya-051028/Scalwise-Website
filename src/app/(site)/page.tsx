@@ -14,6 +14,8 @@ import { PricingSection } from "@/components/sections/PricingSection";
 import { FAQ } from "@/components/sections/FAQ";
 import { ContactSection } from "@/components/sections/ContactSection";
 
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   return (
     <>
