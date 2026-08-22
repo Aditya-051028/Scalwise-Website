@@ -12,4 +12,4 @@ RUN npx next build
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx payload migrate && exec npx next start"]
+CMD ["sh", "-c", "npx payload migrate && exec node_modules/.bin/next start"]
