@@ -3,7 +3,7 @@ import { LeadConfirmation } from "@/emails/LeadConfirmation";
 import { AdminAlert } from "@/emails/AdminAlert";
 import type { Lead } from "@/payload-types";
 
-const FROM_ADDRESS = "Scalwise Media <hello@scalwise.online>";
+const FROM_ADDRESS = "Scalwise Media <hello@mail.scalwise.online>";
 
 function getResendClient(): Resend | null {
   if (!process.env.RESEND_API_KEY) {
