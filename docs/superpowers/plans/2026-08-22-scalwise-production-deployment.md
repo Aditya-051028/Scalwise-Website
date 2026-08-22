@@ -8,6 +8,8 @@
 
 **Tech Stack:** Next.js 16 (App Router), Payload CMS 3.88, `@payloadcms/db-postgres`, Neon Postgres, Vercel (hosting + Blob storage), GitHub (already connected as `origin` → `Aditya-051028/Swastik-Website`).
 
+> **Superseded partway through Task 3:** the user already owned a Hostinger VPS, so execution pivoted from Vercel/Neon to Docker Compose on that VPS (self-hosted Postgres, Caddy for HTTPS, local disk storage instead of Vercel Blob). Tasks 1 and 2 below still shipped as written. Tasks 3 and 4 below are the *original* Vercel-based steps and were not followed as written — see the SDD ledger (`.superpowers/sdd/2026-08-22-scalwise-production-deployment/progress.md`) for what actually happened, and `PROJECT_CONTEXT.md` §11 for the resulting architecture. The repo was also renamed `Aditya-051028/Scalwise-Website` mid-session.
+
 ## Global Constraints
 
 - No custom domain, SEO metadata, sitemap/robots/JSON-LD, Lighthouse pass, or accessibility audit in this plan — all deferred to the separate 6b spec/plan.

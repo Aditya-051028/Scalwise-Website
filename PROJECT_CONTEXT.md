@@ -27,7 +27,7 @@ Brand source of truth: `Scalwise Brand/Scalwise brand guidelines/` (outside this
 | Animation | Framer Motion (`framer-motion`) | ^13 |
 | 3D | React Three Fiber + drei + Three.js | Hero scene only |
 | Animated numbers | `@number-flow/react` | Pricing widget |
-| Deploy target | Vercel (not yet deployed) | — |
+| Deploy target | Docker Compose on a Hostinger VPS, live at [scalwise.online](https://scalwise.online) | — |
 
 No monorepo. No separate backend service — Payload's Next.js integration runs inside this same app. No shadcn/ui — components live in `src/components/ui/` following the same convention shadcn uses, but hand-built to match the brand system exactly rather than pulled from the CLI.
 
@@ -236,8 +236,24 @@ npm run dev            # Next.js dev server, http://localhost:3000
 
 ---
 
-## 11. Known issues / gotchas worth remembering
+## 11. Production deployment
 
+Live at [scalwise.online](https://scalwise.online), via Docker Compose on a Hostinger VPS — not Vercel. Vercel was the original plan (see §13's Sub-project 6a history and `docs/superpowers/specs/2026-08-22-scalwise-production-deployment-design.md`), abandoned mid-setup once it turned out the user already owned a VPS worth using instead of paying for/provisioning Vercel + Neon.
+
+- **Shared VPS.** The server also runs an existing, unrelated n8n (workflow automation) instance, also via Docker Compose, reverse-proxied through the same Caddy container. n8n lives at `n8n.scalwise.online`, in `/opt/n8n/` on the server — never touch its containers or config when working on this app.
+- **This app**: `/opt/scalwise/` on the VPS, a `git clone` of this repo. `docker-compose.yml` (committed here) defines two services: `scalwise-app` (built from this repo's `Dockerfile`) and `scalwise-postgres` (self-hosted Postgres — a deliberate choice over Neon, to keep everything on one server the user already owns). Both join `n8n_default`, the Docker network n8n's compose project created (declared `external: true` here), so Caddy can reverse-proxy to `scalwise-app:3000` by container name without publishing any port to the host.
+- **Secrets** live in `/opt/scalwise/.env` on the VPS only (not committed) — `POSTGRES_USER`/`POSTGRES_PASSWORD`/`POSTGRES_DB`/`PAYLOAD_SECRET`, all distinct from local dev's `.env`.
+- **HTTPS** is entirely Caddy's automatic HTTPS (Let's Encrypt) — one block appended to `/opt/n8n/caddy/Caddyfile` (lives on the server, not in this repo) routes `scalwise.online` and `www.scalwise.online` to `scalwise-app:3000`.
+- **Media storage**: local disk, at `media/` (repo root — see the gotcha below), persisted via the named Docker volume `scalwise_media` so uploads survive image rebuilds. The Vercel Blob storage plugin from Task 2 (`payload.config.ts`'s conditional `vercelBlobStorage`) is still present but dormant here — it only activates if `BLOB_READ_WRITE_TOKEN` is set, which it isn't on this deployment.
+- **Redeploying**: on the VPS, `cd /opt/scalwise && git pull && docker compose up -d --build` — rebuilds the image and restarts the app container. `payload migrate` runs automatically at container start (before `next start`), not at image-build time — the database isn't reachable during the isolated Docker build stage. SSH access used a dedicated key (`claude-scalwise-deploy`) added to the VPS's `authorized_keys` for this session; that key doesn't persist anywhere durable, so a future automated session needs a fresh key added the same way, or the user redeploys manually with their own SSH access using the command above.
+- **Seeding**: the production DB is a separate, empty database from local dev — it needs its own seed run. On the VPS: `docker exec -d scalwise-app sh -c 'cd /app && CI=true npx tsx src/seed.ts > /tmp/seed.log 2>&1'`, then check `/tmp/seed.log`.
+
+---
+
+## 12. Known issues / gotchas worth remembering
+
+- **`Media.ts`'s `staticDir: "media"` resolves to `media/` at the repo root, not `public/media/`.** Cost real debugging time during deployment: a verification script checked for uploaded files at the assumed `public/media/` path, found nothing, and that false negative got misread as a finding about Payload's storage-adapter architecture before the actual path was found by checking the filesystem directly.
+- **`next build` attempts to statically prerender pages by default — including ones that call `getPayloadClient()` at render time.** Works fine on Vercel (env vars + the DB are both reachable during Vercel's build step), but fails with "missing secret key" in an isolated Docker build stage, where neither is available. Fixed by adding `export const dynamic = "force-dynamic"` to `(site)/page.tsx`, which matches the architecture already described in §7 (Server Components fetch via the Local API at request time — this just makes that explicit instead of leaving it to Next.js's default static-optimization attempt).
 - **`AnimatePresence` + a single always-mounted child + changing `key` + `mode="wait"` can permanently freeze.** Hit this in `PricingInteractive` — the feature panel would update its selection indicator correctly but freeze on the first plan's content forever after one switch. Root cause: the exit animation never resolved, so AnimatePresence never progressed to the next child. Fix: drop `AnimatePresence` for this pattern, use a plain `motion.div` with a changing `key` — React handles the mount/unmount directly, Framer Motion only handles the enter transition. `FAQAccordion` uses a *different*, safe pattern (conditional render, not a changing key on an always-mounted child) and was never affected.
 - **`@payloadcms/db-postgres`'s `postgresAdapter()` takes `{ pool: { connectionString } }`, not a flat `{ url }`.** A fetched doc summary suggested `url` — that was wrong (or for a different version). Verified against the actual installed type definitions (`node_modules/@payloadcms/db-postgres/dist/types.d.ts`) after it silently connected to the wrong database. When in doubt, check the installed type defs, not a fetched summary.
 - **Seed scripts must not call `process.exit()` right after async work.** `src/seed.ts` originally called `process.exit(0)` at the end and silently wrote nothing — the process was killed before pending writes/logs flushed. Fixed by using `process.exitCode` and letting the event loop drain naturally (the process then hangs on an open DB connection, which is expected — kill it manually or let the caller's timeout handle it).
@@ -247,9 +263,9 @@ npm run dev            # Next.js dev server, http://localhost:3000
 
 ---
 
-## 12. Roadmap / pending work
+## 13. Roadmap / pending work
 
-Originally scoped as sub-projects; 1 and 2 are done (foundation + full homepage), plus the interactive/animation enhancements requested afterward (pricing widget, kinetic grid, glow buttons, animated contact form). Remaining:
+Originally scoped as sub-projects; 1 and 2 are done (foundation + full homepage), plus the interactive/animation enhancements requested afterward (pricing widget, kinetic grid, glow buttons, animated contact form). Sub-project 6 turned out to bundle two unrelated things — deployment, and SEO/perf/accessibility polish — and was split during brainstorming since deployment had to land first (see `docs/superpowers/specs/2026-08-22-scalwise-production-deployment-design.md`). 6a is done; the rest is remaining:
 
 ### Sub-project 3 — Lead-gen backend hardening
 - Honeypot field + timing check on the contact form (basic spam defense)
@@ -267,11 +283,13 @@ Originally scoped as sub-projects; 1 and 2 are done (foundation + full homepage)
 - Calendly/booking integration
 - Analytics: GA4 + GTM + Meta Pixel + LinkedIn Insight Tag, all through one GTM container (per the original architecture decision) — `SiteSettings.analytics` fields exist but nothing reads them yet
 
-### Sub-project 6 — SEO, performance, accessibility, deployment
+### Sub-project 6a — Production deployment (done)
+Live at [scalwise.online](https://scalwise.online) — see §11 for the architecture. Landed on a Hostinger VPS instead of the originally-planned Vercel/Neon, once it turned out the user already owned a VPS.
+
+### Sub-project 6b — SEO, performance, accessibility (not started)
 - Per-route metadata beyond the basic title/description, `sitemap.ts`, `robots.ts`, JSON-LD (Organization/LocalBusiness, FAQPage, Article), OG images
-- Formal Lighthouse pass (target 95+, per the original brief) — not yet run
+- Formal Lighthouse pass (target 95+, per the original brief) — not yet run, and only meaningful against the real deployment now that one exists
 - Accessibility audit beyond the ad hoc checks done during build (focus states, `prefers-reduced-motion`, semantic labels have been handled inline throughout, but no formal pass)
-- Vercel deployment — not yet deployed anywhere
 
 ### Smaller open items
 - Additional pages: individual case-study detail pages, `/blog` + post pages, `/pricing`, `/contact`, privacy/terms — currently everything lives on the one homepage

@@ -4,6 +4,8 @@ Sub-project 6 of 6 in the original roadmap ("SEO, performance, accessibility, de
 
 Related: [`PROJECT_CONTEXT.md`](../../../PROJECT_CONTEXT.md) is the living reference for the whole codebase. [`2026-08-22-scalwise-foundation-design.md`](2026-08-22-scalwise-foundation-design.md) is the original foundation spec.
 
+> **Superseded during execution.** Everything below reflects the plan as brainstormed and approved — Vercel + Neon + Vercel Blob — and the reasoning is still accurate for why that was the right call *at the time*. Partway through Task 3, it turned out the user already owned a Hostinger VPS worth using instead of provisioning new Vercel/Neon accounts, and execution pivoted there. **`PROJECT_CONTEXT.md` §11 ("Production deployment") describes what's actually running** — Docker Compose on the VPS, self-hosted Postgres, Caddy for HTTPS, no Vercel Blob (local disk works directly on a VPS's persistent filesystem). Migrations (Task 1) and the conditional Blob storage plugin (Task 2) still shipped as designed below and are both still in the codebase — the Blob plugin just stays dormant since nothing sets `BLOB_READ_WRITE_TOKEN` on this deployment target.
+
 ---
 
 ## 1. Goal
