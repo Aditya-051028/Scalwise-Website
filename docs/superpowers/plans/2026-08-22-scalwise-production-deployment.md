@@ -65,11 +65,26 @@ to:
 "build": "payload migrate && next build",
 ```
 
-- [ ] **Step 5: Verify the new build command works locally**
+- [ ] **Step 5: Verify the new build command works against an empty database**
 
-Run: `npm run build`
+The real local dev DB (`scalwise_media`) already has every table from push — running `payload migrate` against it will fail with "relation already exists", since this is the first migration ever created and there's no tracking-table record that would let it recognize the schema as already satisfied. That failure is expected and is not a bug: production (Neon) starts empty, so this conflict never occurs there. Don't run `payload migrate:fresh` or otherwise touch `scalwise_media`'s tables to work around this — that would destroy its seeded data.
 
-Expected: `payload migrate` runs first and reports the migration already applied (or applies it cleanly against the local DB, since the local schema already matches via push), followed by a normal `next build` completing successfully. If `payload migrate` reports unexpected pending changes, stop and investigate before continuing — it means the migration snapshot and the live local schema have drifted.
+Instead, verify against a throwaway empty database that actually mirrors production's starting state:
+
+```bash
+createdb scalwise_media_migration_test
+DATABASE_URL=postgresql://$(whoami)@localhost:5432/scalwise_media_migration_test npm run build
+```
+
+Expected: `payload migrate` applies the new migration cleanly against the empty DB, then `next build` completes successfully. This is the exact command Vercel will run, just pointed at an empty DB instead of Neon.
+
+Then clean up:
+
+```bash
+dropdb scalwise_media_migration_test
+```
+
+The real dev DB keeps using push via `next dev`, unchanged — the `build` script's migrate step only ever runs in production/CI, never locally.
 
 - [ ] **Step 6: Typecheck and lint stay clean**
 
