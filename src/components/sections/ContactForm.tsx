@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/Button";
 import { FloatingLabelInput } from "@/components/ui/FloatingLabelInput";
 import { FloatingLabelTextarea } from "@/components/ui/FloatingLabelTextarea";
 import { FloatingLabelSelect } from "@/components/ui/FloatingLabelSelect";
+import { HoneypotField } from "@/components/ui/HoneypotField";
+import { useHoneypot } from "@/lib/hooks/use-honeypot";
+import { CONTACT_FORM_SOURCE } from "@/lib/form-sources";
 
 const BUSINESS_TYPES = [
   "D2C / Ecommerce",
@@ -69,6 +72,7 @@ const legendClass = "font-mono text-[11px] uppercase tracking-wide text-lavender
 export function ContactForm() {
   const [form, setForm] = useState<FormState>(initialState);
   const [status, setStatus] = useState<Status>("idle");
+  const { website, setWebsite, formRenderedAt } = useHoneypot();
 
   function toggleService(service: string) {
     setForm((prev) => ({
@@ -85,7 +89,7 @@ export function ContactForm() {
     setStatus("submitting");
 
     try {
-      const res = await fetch("/api/leads", {
+      const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -100,6 +104,9 @@ export function ContactForm() {
           monthlyAdBudget: form.monthlyAdBudget || undefined,
           message: form.message || undefined,
           preferredContactMethod: form.preferredContactMethod,
+          website,
+          formRenderedAt,
+          formSource: CONTACT_FORM_SOURCE,
         }),
       });
 
@@ -126,6 +133,7 @@ export function ContactForm() {
   return (
     <GlassPanel className="p-6 sm:p-8">
       <form onSubmit={handleSubmit} className="space-y-6">
+        <HoneypotField value={website} onChange={setWebsite} />
         <div className="grid gap-5 sm:grid-cols-2">
           <FloatingLabelInput
             label="Your name *"
