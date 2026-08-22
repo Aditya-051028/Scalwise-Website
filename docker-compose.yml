@@ -25,6 +25,8 @@ services:
       # POSTGRES_PASSWORD must not contain URL-special characters (/ @ : # %), since it's interpolated unencoded here -- generate it with e.g. `openssl rand -hex 32`, not `-base64` (which can emit `/` and `+`).
       - DATABASE_URL=postgresql://${POSTGRES_USER:?POSTGRES_USER is required}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@scalwise-postgres:5432/${POSTGRES_DB:?POSTGRES_DB is required}
       - PAYLOAD_SECRET=${PAYLOAD_SECRET:?PAYLOAD_SECRET is required}
+      - RESEND_API_KEY=${RESEND_API_KEY:?RESEND_API_KEY is required}
+      - ADMIN_ALERT_EMAIL=${ADMIN_ALERT_EMAIL:?ADMIN_ALERT_EMAIL is required}
       - NODE_ENV=production
     volumes:
       - scalwise_media:/app/media
