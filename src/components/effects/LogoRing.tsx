@@ -55,7 +55,7 @@ export function LogoRing() {
       gap={32}
       duration={40}
       durationOnHover={90}
-      className="w-full [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]"
+      className="w-full pt-5 [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]"
     >
       {ITEMS.map((item, i) => (
         <LogoBadge
