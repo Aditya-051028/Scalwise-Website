@@ -34,6 +34,7 @@
   --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
 
   --animate-float: float 6s ease-in-out infinite;
+  --animate-marquee: marquee 36s linear infinite;
 }
 
 @keyframes float {
@@ -43,6 +44,12 @@
   }
   50% {
     transform: translateY(-14px);
+  }
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
   }
 }
 
