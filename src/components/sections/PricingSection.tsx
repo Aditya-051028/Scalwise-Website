@@ -1,7 +1,7 @@
 import { getPayloadClient } from "@/lib/payload";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/motion/Reveal";
-import { PricingInteractive } from "./PricingInteractive";
+import { PricingPlans } from "./PricingPlans";
 
 export async function PricingSection() {
   const payload = await getPayloadClient();
@@ -13,7 +13,7 @@ export async function PricingSection() {
         <SectionHeading
           eyebrow="Pricing"
           title="Pick your growth plan"
-          description="Content, ads, and local visibility — scaled to where your brand is right now. Tap a plan to see what's included."
+          description="Content, ads, and local visibility — scaled to where your brand is right now. Every plan is custom-scoped, so tell us where you're starting from and we'll size it to fit."
           align="center"
         />
 
@@ -25,13 +25,12 @@ export async function PricingSection() {
         </Reveal>
 
         <Reveal className="mt-12" delay={0.08}>
-          <PricingInteractive plans={docs} />
+          <PricingPlans plans={docs} />
         </Reveal>
 
         <p className="mx-auto mt-12 max-w-2xl text-center font-mono text-[11px] leading-loose text-lavender/70">
-          All plans billed monthly · GST/applicable taxes extra · Meta/Google ad spend billed
-          separately, paid direct to platform · Founding-client pricing, subject to revision
-          after the first cohort · Custom scopes available on request
+          Custom-scoped per brand · Meta/Google ad spend billed separately, paid direct to
+          platform · Founding-client terms, locked in for your first cohort
         </p>
       </div>
     </section>
