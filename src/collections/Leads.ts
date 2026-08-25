@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 import { isLoggedIn } from "./access";
 import { FORM_SOURCES } from "@/lib/form-sources";
+import { BUSINESS_TYPES, AD_BUDGETS, CONTACT_METHODS, SERVICE_INTERESTS } from "@/lib/content/plan-options";
 
 export const Leads: CollectionConfig = {
   slug: "leads",
@@ -25,46 +26,24 @@ export const Leads: CollectionConfig = {
     {
       name: "businessType",
       type: "select",
-      options: [
-        "D2C / Ecommerce",
-        "Local Business",
-        "Real Estate",
-        "Healthcare",
-        "Coaching / Consulting",
-        "Startup",
-        "Luxury Brand",
-        "Other",
-      ],
+      options: [...BUSINESS_TYPES],
     },
     {
       name: "interestedServices",
       type: "select",
       hasMany: true,
-      options: [
-        "Performance Marketing",
-        "SEO & Local",
-        "Web & Landing Pages",
-        "Content & Social",
-        "Automation & CRO",
-        "Brand & Strategy",
-      ],
+      options: [...SERVICE_INTERESTS],
     },
     {
       name: "monthlyAdBudget",
       type: "select",
-      options: [
-        "Not yet spending",
-        "Under ₹50,000",
-        "₹50,000 – ₹2,00,000",
-        "₹2,00,000 – ₹5,00,000",
-        "₹5,00,000+",
-      ],
+      options: [...AD_BUDGETS],
     },
     { name: "message", type: "textarea" },
     {
       name: "preferredContactMethod",
       type: "select",
-      options: ["Email", "Phone", "WhatsApp"],
+      options: [...CONTACT_METHODS],
       defaultValue: "Email",
     },
     {

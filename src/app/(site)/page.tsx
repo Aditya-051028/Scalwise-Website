@@ -11,6 +11,7 @@ import { Proof } from "@/components/sections/Proof";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { WhyScalwise } from "@/components/sections/WhyScalwise";
 import { PricingSection } from "@/components/sections/PricingSection";
+import { CustomQuoteSection } from "@/components/sections/CustomQuoteSection";
 import { FAQ } from "@/components/sections/FAQ";
 import { ContactSection } from "@/components/sections/ContactSection";
 
@@ -33,6 +34,7 @@ export default function Home() {
           <Testimonials />
           <WhyScalwise />
           <PricingSection />
+          <CustomQuoteSection />
           <Divider flip />
           <FAQ />
           <ContactSection />

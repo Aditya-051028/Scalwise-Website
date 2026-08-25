@@ -3,24 +3,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/motion/Reveal";
 import { GlassPanel } from "@/components/ui/GlassPanel";
 import { TiltCard } from "@/components/ui/TiltCard";
-
-const CATEGORY_ORDER = [
-  "Performance Marketing",
-  "SEO & Local",
-  "Web & Landing Pages",
-  "Content & Social",
-  "Automation & CRO",
-  "Brand & Strategy",
-] as const;
-
-const CATEGORY_BLURB: Record<string, string> = {
-  "Performance Marketing": "Ads that hit a CAC target, not just reach.",
-  "SEO & Local": "Show up where buyers are already searching.",
-  "Web & Landing Pages": "Pages built to convert, not just look nice.",
-  "Content & Social": "Content and email that keep showing up.",
-  "Automation & CRO": "Get more from the traffic you already have.",
-  "Brand & Strategy": "Positioning that makes everything else work harder.",
-};
+import { SERVICE_INTERESTS as CATEGORY_ORDER, SERVICE_BLURBS as CATEGORY_BLURB } from "@/lib/content/plan-options";
 
 export async function Services() {
   const payload = await getPayloadClient();

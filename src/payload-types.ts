@@ -242,7 +242,7 @@ export interface Lead {
   message?: string | null;
   preferredContactMethod?: ('Email' | 'Phone' | 'WhatsApp') | null;
   status?: ('New' | 'Contacted' | 'Qualified' | 'Won' | 'Lost') | null;
-  formSource?: ('Contact Form' | 'Newsletter Footer') | null;
+  formSource?: ('Contact Form' | 'Newsletter Footer' | 'Custom Quote') | null;
   source?: {
     utmSource?: string | null;
     utmMedium?: string | null;

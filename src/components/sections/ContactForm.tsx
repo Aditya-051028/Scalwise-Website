@@ -9,37 +9,7 @@ import { FloatingLabelSelect } from "@/components/ui/FloatingLabelSelect";
 import { HoneypotField } from "@/components/ui/HoneypotField";
 import { useHoneypot } from "@/lib/hooks/use-honeypot";
 import { CONTACT_FORM_SOURCE } from "@/lib/form-sources";
-
-const BUSINESS_TYPES = [
-  "D2C / Ecommerce",
-  "Local Business",
-  "Real Estate",
-  "Healthcare",
-  "Coaching / Consulting",
-  "Startup",
-  "Luxury Brand",
-  "Other",
-];
-
-const AD_BUDGETS = [
-  "Not yet spending",
-  "Under ₹50,000",
-  "₹50,000 – ₹2,00,000",
-  "₹2,00,000 – ₹5,00,000",
-  "₹5,00,000+",
-];
-
-const CONTACT_METHODS = ["Email", "Phone", "WhatsApp"];
-
-// Mirrors the real categories in the Services section — not generic agency options.
-const SERVICE_INTERESTS = [
-  "Performance Marketing",
-  "SEO & Local",
-  "Web & Landing Pages",
-  "Content & Social",
-  "Automation & CRO",
-  "Brand & Strategy",
-];
+import { BUSINESS_TYPES, AD_BUDGETS, CONTACT_METHODS, SERVICE_INTERESTS } from "@/lib/content/plan-options";
 
 type Status = "idle" | "submitting" | "success" | "error";
 

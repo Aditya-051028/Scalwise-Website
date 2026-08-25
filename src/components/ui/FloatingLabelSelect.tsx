@@ -8,7 +8,7 @@ interface FloatingLabelSelectProps
   label: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  options: string[];
+  options: readonly string[];
   containerClassName?: string;
 }
 

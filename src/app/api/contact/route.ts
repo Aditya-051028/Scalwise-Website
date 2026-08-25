@@ -4,7 +4,7 @@ import { getPayloadClient } from "@/lib/payload";
 import { isRateLimited } from "@/lib/rate-limit";
 import { isSpamSubmission } from "@/lib/spam-check";
 import { sendLeadConfirmation, sendAdminAlert } from "@/lib/email";
-import { FORM_SOURCES, CONTACT_FORM_SOURCE, type FormSource } from "@/lib/form-sources";
+import { FORM_SOURCES, CONTACT_FORM_SOURCE, NEWSLETTER_FORM_SOURCE, type FormSource } from "@/lib/form-sources";
 
 // Only fields the real forms send are writable through this public endpoint —
 // everything else (status, source/UTM group) is staff-managed via the admin panel.
@@ -79,7 +79,7 @@ export async function POST(request: Request) {
     );
   }
 
-  if (lead.formSource === CONTACT_FORM_SOURCE) {
+  if (lead.formSource !== NEWSLETTER_FORM_SOURCE) {
     sendLeadConfirmation(lead).catch((err) =>
       console.error("[api/contact] confirmation email failed:", err),
     );
