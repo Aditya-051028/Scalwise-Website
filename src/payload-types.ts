@@ -74,6 +74,7 @@ export interface Config {
     pricing: Pricing;
     testimonials: Testimonial;
     'case-studies': CaseStudy;
+    products: Product;
     'blog-posts': BlogPost;
     faqs: Faq;
     'payload-kv': PayloadKv;
@@ -90,6 +91,7 @@ export interface Config {
     pricing: PricingSelect<false> | PricingSelect<true>;
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
     'case-studies': CaseStudiesSelect<false> | CaseStudiesSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
     'blog-posts': BlogPostsSelect<false> | BlogPostsSelect<true>;
     faqs: FaqsSelect<false> | FaqsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -405,6 +407,48 @@ export interface CaseStudy {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: number;
+  title: string;
+  slug: string;
+  productType: 'E-book';
+  /**
+   * Coming Soon shows the product without a working Buy Now link yet.
+   */
+  status: 'Coming Soon' | 'Available';
+  coverImage?: (number | null) | Media;
+  /**
+   * One line, shown on the product card.
+   */
+  shortDescription?: string | null;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * In the currency below, e.g. 499 for ₹499.
+   */
+  price?: number | null;
+  currency?: string | null;
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "blog-posts".
  */
 export interface BlogPost {
@@ -507,6 +551,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'case-studies';
         value: number | CaseStudy;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: number | Product;
       } | null)
     | ({
         relationTo: 'blog-posts';
@@ -734,6 +782,24 @@ export interface CaseStudiesSelect<T extends boolean = true> {
         id?: T;
       };
   sampleData?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  productType?: T;
+  status?: T;
+  coverImage?: T;
+  shortDescription?: T;
+  description?: T;
+  price?: T;
+  currency?: T;
+  order?: T;
   updatedAt?: T;
   createdAt?: T;
 }

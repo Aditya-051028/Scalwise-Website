@@ -1,19 +1,21 @@
 import Image from "next/image";
+import Link from "next/link";
 import { GradientReveal } from "@/components/effects/GradientReveal";
 import { FooterNewsletterForm } from "./FooterNewsletterForm";
 
 const EXPLORE_LINKS = [
-  { label: "Services", href: "#services" },
-  { label: "Industries", href: "#industries" },
-  { label: "Process", href: "#process" },
-  { label: "Pricing", href: "#pricing" },
+  { label: "Services", href: "/#services" },
+  { label: "Industries", href: "/#industries" },
+  { label: "Process", href: "/#process" },
+  { label: "Pricing", href: "/#pricing" },
+  { label: "Products", href: "/products" },
 ];
 
 const COMPANY_LINKS = [
-  { label: "Proof of work", href: "#proof" },
-  { label: "Why Scalwise", href: "#why-scalwise" },
-  { label: "FAQ", href: "#faq" },
-  { label: "Contact", href: "#contact" },
+  { label: "Proof of work", href: "/#proof" },
+  { label: "Why Scalwise", href: "/#why-scalwise" },
+  { label: "FAQ", href: "/#faq" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 export function Footer() {
@@ -22,7 +24,7 @@ export function Footer() {
       <div className="relative z-20 mx-auto w-full max-w-7xl px-6 pt-16 md:px-12">
         <div className="grid gap-10 pb-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-2">
-            <a href="#hero" className="flex items-center gap-2.5">
+            <Link href="/#hero" className="flex items-center gap-2.5">
               <Image
                 src="/brand/scalwise-icon.svg"
                 alt="Scalwise Media"
@@ -34,7 +36,7 @@ export function Footer() {
                 <span className="font-display text-lg font-bold text-paper">SCALWISE</span>
                 <span className="font-mono text-[10px] tracking-[0.3em] text-neon">MEDIA</span>
               </span>
-            </a>
+            </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-lavender">
               Performance ads, local SEO, and content for local and D2C brands.
               Scale smarter, not louder.
@@ -47,12 +49,12 @@ export function Footer() {
             <ul className="mt-4 flex flex-col gap-3">
               {EXPLORE_LINKS.map((link) => (
                 <li key={link.href}>
-                  <a
+                  <Link
                     href={link.href}
                     className="text-sm text-lavender transition-colors duration-200 hover:text-paper"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -63,12 +65,12 @@ export function Footer() {
             <ul className="mt-4 flex flex-col gap-3">
               {COMPANY_LINKS.map((link) => (
                 <li key={link.href}>
-                  <a
+                  <Link
                     href={link.href}
                     className="text-sm text-lavender transition-colors duration-200 hover:text-paper"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>

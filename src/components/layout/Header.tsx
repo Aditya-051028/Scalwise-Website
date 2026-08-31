@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { useScrolled } from "@/lib/hooks/use-scrolled";
 
@@ -16,7 +17,7 @@ export function Header() {
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 md:px-12">
-        <a href="#hero" className="flex items-center gap-2.5">
+        <Link href="/#hero" className="flex items-center gap-2.5">
           <Image
             src="/brand/scalwise-icon.svg"
             alt="Scalwise Media"
@@ -33,11 +34,19 @@ export function Header() {
               MEDIA
             </span>
           </span>
-        </a>
-        <div className="hidden sm:block">
-          <Button href="#contact" variant="secondary">
-            Get Your Growth Plan
-          </Button>
+        </Link>
+        <div className="flex items-center gap-6">
+          <Link
+            href="/products"
+            className="hidden font-mono text-xs uppercase tracking-wide text-lavender transition-colors duration-200 hover:text-paper sm:block"
+          >
+            Products
+          </Link>
+          <div className="hidden sm:block">
+            <Button href="/#contact" variant="secondary">
+              Get Your Growth Plan
+            </Button>
+          </div>
         </div>
       </div>
     </header>

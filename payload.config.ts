@@ -13,6 +13,7 @@ import { Services } from "./src/collections/Services";
 import { Pricing } from "./src/collections/Pricing";
 import { Testimonials } from "./src/collections/Testimonials";
 import { CaseStudies } from "./src/collections/CaseStudies";
+import { Products } from "./src/collections/Products";
 import { BlogPosts } from "./src/collections/BlogPosts";
 import { FAQs } from "./src/collections/FAQs";
 import { SiteSettings } from "./src/collections/SiteSettings";
@@ -33,6 +34,7 @@ export default buildConfig({
     Pricing,
     Testimonials,
     CaseStudies,
+    Products,
     BlogPosts,
     FAQs,
   ],
