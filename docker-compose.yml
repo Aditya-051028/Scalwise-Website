@@ -27,7 +27,6 @@ services:
       - PAYLOAD_SECRET=${PAYLOAD_SECRET:?PAYLOAD_SECRET is required}
       - RESEND_API_KEY=${RESEND_API_KEY:?RESEND_API_KEY is required}
       - ADMIN_ALERT_EMAIL=${ADMIN_ALERT_EMAIL:?ADMIN_ALERT_EMAIL is required}
-      - DEV_SEED_TOKEN=${DEV_SEED_TOKEN:-}
       - NODE_ENV=production
     volumes:
       - scalwise_media:/app/media
