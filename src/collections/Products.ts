@@ -41,6 +41,12 @@ export const Products: CollectionConfig = {
         description: "Coming Soon shows the product without a working Buy Now link yet.",
       },
     },
+    {
+      name: "featured",
+      type: "checkbox",
+      defaultValue: false,
+      admin: { position: "sidebar", description: "Shows a FEATURED badge on the product card." },
+    },
     { name: "coverImage", type: "upload", relationTo: "media" },
     { name: "shortDescription", type: "text", admin: { description: "One line, shown on the product card." } },
     { name: "description", type: "richText" },
@@ -50,6 +56,24 @@ export const Products: CollectionConfig = {
       admin: { description: "In the currency below, e.g. 499 for ₹499." },
     },
     { name: "currency", type: "text", defaultValue: "INR" },
+    {
+      name: "checkoutUrl",
+      type: "text",
+      admin: {
+        position: "sidebar",
+        description:
+          "Payment gateway checkout link. Leave empty to show a 'Checkout Coming Soon' state instead of a broken Buy Now button.",
+      },
+    },
+    {
+      name: "deliveryUrl",
+      type: "text",
+      admin: {
+        position: "sidebar",
+        description:
+          "Where the Thank You page's Download button sends a verified buyer. Leave empty until real delivery (e.g. a signed download link) is wired up — the page will show an 'on its way' message instead of a broken link.",
+      },
+    },
     { name: "order", type: "number", defaultValue: 0, admin: { position: "sidebar" } },
   ],
 };

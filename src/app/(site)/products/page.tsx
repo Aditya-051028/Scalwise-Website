@@ -8,12 +8,14 @@ import { GlassPanel } from "@/components/ui/GlassPanel";
 import { TiltCard } from "@/components/ui/TiltCard";
 import { Reveal } from "@/components/motion/Reveal";
 import { getPayloadClient } from "@/lib/payload";
+import { PageViewTracker } from "@/components/sections/ai-cashflow/PageViewTracker";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Products",
-  description: "E-books and other resources from Scalwise Media.",
+  title: "E-Books",
+  description:
+    "Practical digital playbooks from Scalwise Media, built to help you turn ideas into action.",
 };
 
 export default async function ProductsPage() {
@@ -27,14 +29,15 @@ export default async function ProductsPage() {
   return (
     <>
       <KineticGrid className="z-0" />
+      <PageViewTracker event="ebook_page_view" />
       <Header />
       <div className="relative z-10 flex flex-1 flex-col">
         <main className="flex-1 px-6 py-24 md:px-12 md:py-32">
           <div className="mx-auto max-w-7xl">
             <SectionHeading
               eyebrow="Products"
-              title="E-books"
-              description="Practical, no-fluff guides on performance marketing and local growth — built from the same playbook we run for clients."
+              title="E-Books That Help You Build, Create & Grow"
+              description="Practical digital playbooks built to help you turn ideas into action."
             />
 
             {products.length === 0 ? (
@@ -59,14 +62,27 @@ export default async function ProductsPage() {
                     <TiltCard tiltDegrees={6} className="h-full">
                       <Link href={`/products/${product.slug}`} className="block h-full">
                         <GlassPanel className="flex h-full flex-col p-6 transition-[border-color,box-shadow] duration-300 ease-premium hover:border-purple-light/50 hover:shadow-glow-purple">
-                          {product.coverImage && typeof product.coverImage === "object" ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={product.coverImage.url ?? undefined}
-                              alt={product.coverImage.alt ?? product.title}
-                              className="mb-4 aspect-[3/4] w-full rounded-xl object-cover"
-                            />
-                          ) : null}
+                          <div className="relative mb-4">
+                            {product.coverImage && typeof product.coverImage === "object" ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={product.coverImage.url ?? undefined}
+                                alt={product.coverImage.alt ?? product.title}
+                                className="aspect-[3/4] w-full rounded-xl object-cover"
+                              />
+                            ) : (
+                              <div className="flex aspect-[3/4] w-full items-center justify-center rounded-xl border border-line bg-void-3/60">
+                                <span className="font-mono text-xs uppercase tracking-wide text-lavender/60">
+                                  Cover coming soon
+                                </span>
+                              </div>
+                            )}
+                            {product.featured ? (
+                              <span className="absolute top-3 left-3 rounded-full bg-neon px-2.5 py-1 font-mono text-[9.5px] font-bold uppercase tracking-wide text-void">
+                                Featured
+                              </span>
+                            ) : null}
+                          </div>
                           <span className="font-mono text-[10px] uppercase tracking-wide text-neon">
                             {product.productType}
                             {product.status === "Coming Soon" ? " · Coming Soon" : ""}
@@ -77,12 +93,16 @@ export default async function ProductsPage() {
                           {product.shortDescription ? (
                             <p className="mt-2 text-sm text-lavender">{product.shortDescription}</p>
                           ) : null}
-                          {product.price ? (
-                            <p className="mt-4 font-mono text-sm text-paper">
-                              {product.currency === "INR" ? "₹" : `${product.currency} `}
-                              {product.price}
-                            </p>
-                          ) : null}
+                          <p className="mt-4 font-mono text-sm text-paper">
+                            {product.price
+                              ? `${product.currency === "INR" ? "₹" : `${product.currency} `}${product.price}`
+                              : product.currency === "INR"
+                                ? "₹XXX"
+                                : "[PRICE]"}
+                          </p>
+                          <span className="mt-4 inline-block font-mono text-xs uppercase tracking-wide text-neon">
+                            {product.status === "Available" ? "View Book →" : "Learn More →"}
+                          </span>
                         </GlassPanel>
                       </Link>
                     </TiltCard>

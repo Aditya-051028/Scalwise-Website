@@ -42,7 +42,7 @@ export function Button({
 
   if (href) {
     return (
-      <motion.a href={href} className={classes} {...motionProps}>
+      <motion.a href={href} onClick={onClick} className={classes} {...motionProps}>
         {children}
       </motion.a>
     );

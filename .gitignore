@@ -37,6 +37,13 @@ yarn-error.log*
 # vercel
 .vercel
 
+# Payload local-disk uploads — persisted via a Docker volume in production
+# (docker-compose.yml), not sourced from git. Committing these binaries
+# wouldn't even reach production, since the volume is the actual source of
+# truth there; each environment gets its own uploads via the admin panel or
+# a one-off seed step instead.
+/media/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

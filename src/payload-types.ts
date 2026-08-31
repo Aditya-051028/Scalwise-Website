@@ -418,6 +418,10 @@ export interface Product {
    * Coming Soon shows the product without a working Buy Now link yet.
    */
   status: 'Coming Soon' | 'Available';
+  /**
+   * Shows a FEATURED badge on the product card.
+   */
+  featured?: boolean | null;
   coverImage?: (number | null) | Media;
   /**
    * One line, shown on the product card.
@@ -443,6 +447,14 @@ export interface Product {
    */
   price?: number | null;
   currency?: string | null;
+  /**
+   * Payment gateway checkout link. Leave empty to show a 'Checkout Coming Soon' state instead of a broken Buy Now button.
+   */
+  checkoutUrl?: string | null;
+  /**
+   * Where the Thank You page's Download button sends a verified buyer. Leave empty until real delivery (e.g. a signed download link) is wired up — the page will show an 'on its way' message instead of a broken link.
+   */
+  deliveryUrl?: string | null;
   order?: number | null;
   updatedAt: string;
   createdAt: string;
@@ -794,11 +806,14 @@ export interface ProductsSelect<T extends boolean = true> {
   slug?: T;
   productType?: T;
   status?: T;
+  featured?: T;
   coverImage?: T;
   shortDescription?: T;
   description?: T;
   price?: T;
   currency?: T;
+  checkoutUrl?: T;
+  deliveryUrl?: T;
   order?: T;
   updatedAt?: T;
   createdAt?: T;
