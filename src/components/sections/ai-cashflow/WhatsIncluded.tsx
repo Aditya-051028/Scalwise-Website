@@ -6,12 +6,19 @@ import { PriceTag } from "./PriceTag";
 
 type WhatsIncludedProps = {
   price: number | null | undefined;
+  originalPrice?: number | null;
   currency: string | null | undefined;
   checkoutUrl?: string | null;
   active: boolean;
 };
 
-export function WhatsIncluded({ price, currency, checkoutUrl, active }: WhatsIncludedProps) {
+export function WhatsIncluded({
+  price,
+  originalPrice,
+  currency,
+  checkoutUrl,
+  active,
+}: WhatsIncludedProps) {
   return (
     <section className="px-6 py-24 md:px-12 md:py-32">
       <div className="mx-auto max-w-2xl">
@@ -30,7 +37,7 @@ export function WhatsIncluded({ price, currency, checkoutUrl, active }: WhatsInc
               ))}
             </ul>
             <div className="mt-8 flex flex-wrap items-center gap-4 border-t border-line pt-6">
-              <PriceTag price={price} currency={currency} />
+              <PriceTag price={price} originalPrice={originalPrice} currency={currency} className="text-lg" />
               <BuyNowButton checkoutUrl={checkoutUrl} active={active} location="whats_included" />
             </div>
           </GlassPanel>

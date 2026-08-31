@@ -9,6 +9,7 @@ import { TiltCard } from "@/components/ui/TiltCard";
 import { Reveal } from "@/components/motion/Reveal";
 import { getPayloadClient } from "@/lib/payload";
 import { PageViewTracker } from "@/components/sections/ai-cashflow/PageViewTracker";
+import { PriceTag } from "@/components/sections/ai-cashflow/PriceTag";
 
 export const dynamic = "force-dynamic";
 
@@ -93,13 +94,12 @@ export default async function ProductsPage() {
                           {product.shortDescription ? (
                             <p className="mt-2 text-sm text-lavender">{product.shortDescription}</p>
                           ) : null}
-                          <p className="mt-4 font-mono text-sm text-paper">
-                            {product.price
-                              ? `${product.currency === "INR" ? "₹" : `${product.currency} `}${product.price}`
-                              : product.currency === "INR"
-                                ? "₹XXX"
-                                : "[PRICE]"}
-                          </p>
+                          <PriceTag
+                            price={product.price}
+                            originalPrice={product.originalPrice}
+                            currency={product.currency}
+                            className="mt-4 text-sm"
+                          />
                           <span className="mt-4 inline-block font-mono text-xs uppercase tracking-wide text-neon">
                             {product.status === "Available" ? "View Book →" : "Learn More →"}
                           </span>

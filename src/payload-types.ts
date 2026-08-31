@@ -443,9 +443,13 @@ export interface Product {
     [k: string]: unknown;
   } | null;
   /**
-   * In the currency below, e.g. 499 for ₹499.
+   * The actual selling price, in the currency below.
    */
   price?: number | null;
+  /**
+   * Optional — set higher than price to show it struck through next to the discounted price. Leave empty for no discount display.
+   */
+  originalPrice?: number | null;
   currency?: string | null;
   /**
    * Payment gateway checkout link. Leave empty to show a 'Checkout Coming Soon' state instead of a broken Buy Now button.
@@ -811,6 +815,7 @@ export interface ProductsSelect<T extends boolean = true> {
   shortDescription?: T;
   description?: T;
   price?: T;
+  originalPrice?: T;
   currency?: T;
   checkoutUrl?: T;
   deliveryUrl?: T;

@@ -3,6 +3,7 @@ import * as migration_20260822_194410_add_form_source from './20260822_194410_ad
 import * as migration_20260825_193747_add_custom_quote_form_source from './20260825_193747_add_custom_quote_form_source';
 import * as migration_20260831_195750_add_products_collection from './20260831_195750_add_products_collection';
 import * as migration_20260831_221907_add_products_checkout_delivery_featured from './20260831_221907_add_products_checkout_delivery_featured';
+import * as migration_20260831_230654_add_products_original_price from './20260831_230654_add_products_original_price';
 
 export const migrations = [
   {
@@ -28,6 +29,11 @@ export const migrations = [
   {
     up: migration_20260831_221907_add_products_checkout_delivery_featured.up,
     down: migration_20260831_221907_add_products_checkout_delivery_featured.down,
-    name: '20260831_221907_add_products_checkout_delivery_featured'
+    name: '20260831_221907_add_products_checkout_delivery_featured',
+  },
+  {
+    up: migration_20260831_230654_add_products_original_price.up,
+    down: migration_20260831_230654_add_products_original_price.down,
+    name: '20260831_230654_add_products_original_price'
   },
 ];

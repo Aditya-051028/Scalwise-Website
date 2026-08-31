@@ -53,7 +53,15 @@ export const Products: CollectionConfig = {
     {
       name: "price",
       type: "number",
-      admin: { description: "In the currency below, e.g. 499 for ₹499." },
+      admin: { description: "The actual selling price, in the currency below." },
+    },
+    {
+      name: "originalPrice",
+      type: "number",
+      admin: {
+        description:
+          "Optional — set higher than price to show it struck through next to the discounted price. Leave empty for no discount display.",
+      },
     },
     { name: "currency", type: "text", defaultValue: "INR" },
     {

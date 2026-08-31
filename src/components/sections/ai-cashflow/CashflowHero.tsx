@@ -5,6 +5,7 @@ import { PriceTag } from "./PriceTag";
 
 type CashflowHeroProps = {
   price: number | null | undefined;
+  originalPrice?: number | null;
   currency: string | null | undefined;
   checkoutUrl?: string | null;
   active: boolean;
@@ -12,7 +13,15 @@ type CashflowHeroProps = {
   coverAlt?: string | null;
 };
 
-export function CashflowHero({ price, currency, checkoutUrl, active, coverUrl, coverAlt }: CashflowHeroProps) {
+export function CashflowHero({
+  price,
+  originalPrice,
+  currency,
+  checkoutUrl,
+  active,
+  coverUrl,
+  coverAlt,
+}: CashflowHeroProps) {
   return (
     <section className="px-6 pt-16 pb-20 md:px-12 md:pt-24 md:pb-28">
       <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
@@ -30,7 +39,7 @@ export function CashflowHero({ price, currency, checkoutUrl, active, coverUrl, c
           <p className="mt-3 font-mono text-sm text-neon">{HERO.supportingLine}</p>
 
           <div className="mt-8 flex flex-wrap items-center gap-4">
-            <PriceTag price={price} currency={currency} />
+            <PriceTag price={price} originalPrice={originalPrice} currency={currency} className="text-lg" />
             <BuyNowButton checkoutUrl={checkoutUrl} active={active} location="hero" />
           </div>
           <p className="mt-3 font-mono text-[11px] text-lavender/70">

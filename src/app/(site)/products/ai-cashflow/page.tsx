@@ -60,6 +60,7 @@ export default async function AiCashflowPage() {
   const product = await getProduct();
 
   const price = product?.price ?? null;
+  const originalPrice = product?.originalPrice ?? null;
   const currency = product?.currency ?? "INR";
   const checkoutUrl = product?.checkoutUrl ?? null;
   const active = product?.status === "Available" && Boolean(checkoutUrl);
@@ -75,6 +76,7 @@ export default async function AiCashflowPage() {
           <AnnouncementStrip />
           <CashflowHero
             price={price}
+            originalPrice={originalPrice}
             currency={currency}
             checkoutUrl={checkoutUrl}
             active={active}
@@ -89,14 +91,26 @@ export default async function AiCashflowPage() {
           <ThirtyDayPlan />
           <ProductPreview />
           <WhoItsFor />
-          <WhatsIncluded price={price} currency={currency} checkoutUrl={checkoutUrl} active={active} />
+          <WhatsIncluded
+            price={price}
+            originalPrice={originalPrice}
+            currency={currency}
+            checkoutUrl={checkoutUrl}
+            active={active}
+          />
           <ObjectionHandling />
           <CashflowFAQ />
           <FinalCTA checkoutUrl={checkoutUrl} active={active} />
         </main>
         <Footer />
       </div>
-      <StickyMobileCTA price={price} currency={currency} checkoutUrl={checkoutUrl} active={active} />
+      <StickyMobileCTA
+        price={price}
+        originalPrice={originalPrice}
+        currency={currency}
+        checkoutUrl={checkoutUrl}
+        active={active}
+      />
     </>
   );
 }
