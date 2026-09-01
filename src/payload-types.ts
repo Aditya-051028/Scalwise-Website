@@ -75,6 +75,7 @@ export interface Config {
     testimonials: Testimonial;
     'case-studies': CaseStudy;
     products: Product;
+    orders: Order;
     'blog-posts': BlogPost;
     faqs: Faq;
     'payload-kv': PayloadKv;
@@ -92,6 +93,7 @@ export interface Config {
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
     'case-studies': CaseStudiesSelect<false> | CaseStudiesSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
     'blog-posts': BlogPostsSelect<false> | BlogPostsSelect<true>;
     faqs: FaqsSelect<false> | FaqsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -465,6 +467,31 @@ export interface Product {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: number;
+  razorpayPaymentId: string;
+  razorpayPaymentLinkId?: string | null;
+  product: number | Product;
+  amount?: number | null;
+  currency?: string | null;
+  buyerEmail?: string | null;
+  buyerContact?: string | null;
+  rawPayload?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "blog-posts".
  */
 export interface BlogPost {
@@ -571,6 +598,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'products';
         value: number | Product;
+      } | null)
+    | ({
+        relationTo: 'orders';
+        value: number | Order;
       } | null)
     | ({
         relationTo: 'blog-posts';
@@ -820,6 +851,22 @@ export interface ProductsSelect<T extends boolean = true> {
   checkoutUrl?: T;
   deliveryUrl?: T;
   order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  razorpayPaymentId?: T;
+  razorpayPaymentLinkId?: T;
+  product?: T;
+  amount?: T;
+  currency?: T;
+  buyerEmail?: T;
+  buyerContact?: T;
+  rawPayload?: T;
   updatedAt?: T;
   createdAt?: T;
 }
