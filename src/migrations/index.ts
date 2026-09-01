@@ -5,6 +5,7 @@ import * as migration_20260831_195750_add_products_collection from './20260831_1
 import * as migration_20260831_221907_add_products_checkout_delivery_featured from './20260831_221907_add_products_checkout_delivery_featured';
 import * as migration_20260831_230654_add_products_original_price from './20260831_230654_add_products_original_price';
 import * as migration_20260901_125633_add_orders_collection from './20260901_125633_add_orders_collection';
+import * as migration_20260901_130920_add_products_razorpay_payment_link_id from './20260901_130920_add_products_razorpay_payment_link_id';
 
 export const migrations = [
   {
@@ -40,6 +41,11 @@ export const migrations = [
   {
     up: migration_20260901_125633_add_orders_collection.up,
     down: migration_20260901_125633_add_orders_collection.down,
-    name: '20260901_125633_add_orders_collection'
+    name: '20260901_125633_add_orders_collection',
+  },
+  {
+    up: migration_20260901_130920_add_products_razorpay_payment_link_id.up,
+    down: migration_20260901_130920_add_products_razorpay_payment_link_id.down,
+    name: '20260901_130920_add_products_razorpay_payment_link_id'
   },
 ];

@@ -458,6 +458,10 @@ export interface Product {
    */
   checkoutUrl?: string | null;
   /**
+   * Razorpay's internal Payment Link ID (format plink_...), NOT the public rzp.io URL. Find it in the Razorpay dashboard's Payment Link details, or from the first real webhook payload. Required for the payment-verification webhook to attribute a sale to this product.
+   */
+  razorpayPaymentLinkId?: string | null;
+  /**
    * Where the Thank You page's Download button sends a verified buyer. Leave empty until real delivery (e.g. a signed download link) is wired up — the page will show an 'on its way' message instead of a broken link.
    */
   deliveryUrl?: string | null;
@@ -849,6 +853,7 @@ export interface ProductsSelect<T extends boolean = true> {
   originalPrice?: T;
   currency?: T;
   checkoutUrl?: T;
+  razorpayPaymentLinkId?: T;
   deliveryUrl?: T;
   order?: T;
   updatedAt?: T;

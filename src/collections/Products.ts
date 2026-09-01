@@ -74,6 +74,15 @@ export const Products: CollectionConfig = {
       },
     },
     {
+      name: "razorpayPaymentLinkId",
+      type: "text",
+      admin: {
+        position: "sidebar",
+        description:
+          "Razorpay's internal Payment Link ID (format plink_...), NOT the public rzp.io URL. Find it in the Razorpay dashboard's Payment Link details, or from the first real webhook payload. Required for the payment-verification webhook to attribute a sale to this product.",
+      },
+    },
+    {
       name: "deliveryUrl",
       type: "text",
       admin: {
