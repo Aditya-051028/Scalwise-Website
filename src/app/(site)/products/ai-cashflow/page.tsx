@@ -35,14 +35,14 @@ export const metadata: Metadata = {
     description:
       "An 83-page practical playbook for beginners — AI, content and social media, with a 30-day action plan and 100-prompt pack.",
     url: PAGE_URL,
-    images: ["/ai-cashflow/cover.png"],
+    images: ["/ai-cashflow/book-mockup-cover.png"],
   },
   twitter: {
     card: "summary_large_image",
     title: "AI CASHFLOW | Build Your First Online Income Stream With AI",
     description:
       "An 83-page practical playbook for beginners — AI, content and social media, with a 30-day action plan and 100-prompt pack.",
-    images: ["/ai-cashflow/cover.png"],
+    images: ["/ai-cashflow/book-mockup-cover.png"],
   },
 };
 
@@ -80,7 +80,7 @@ export default async function AiCashflowPage() {
             currency={currency}
             checkoutUrl={checkoutUrl}
             active={active}
-            coverUrl={cover?.url ?? "/ai-cashflow/cover.png"}
+            coverUrl={cover?.url ?? "/ai-cashflow/book-mockup-cover.png"}
             coverAlt={cover?.alt ?? "AI Cashflow ebook cover"}
           />
           <ProblemSection />
