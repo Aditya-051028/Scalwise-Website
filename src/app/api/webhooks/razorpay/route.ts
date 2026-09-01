@@ -23,22 +23,30 @@ function isValidSignature(rawBody: string, signature: string | null): boolean {
   );
 }
 
-type RazorpayPaymentLinkPaidPayload = {
+// The checkout in use (a Razorpay Payment PAGE, id prefix `pl_`) is a different
+// product from Razorpay Payment LINKS (`plink_...`) and fires `order.paid` /
+// `payment.captured`, not `payment_link.paid` — confirmed against a real
+// transaction's payload, which carries no payment-page-identifying field at all.
+// With exactly one product live, attribution is by amount match instead of by ID;
+// this must be revisited (e.g. distinct amounts, or Payment Page `notes`/receipt
+// wiring) before a second product goes on sale through this same webhook.
+type RazorpayOrderPaidPayload = {
   event: string;
   payload: {
-    payment_link: {
-      entity: {
-        id: string;
-        customer?: { email?: string; contact?: string };
-      };
-    };
     payment: {
       entity: {
         id: string;
+        order_id: string;
         amount: number;
         currency: string;
         email?: string;
         contact?: string;
+      };
+    };
+    order: {
+      entity: {
+        id: string;
+        amount: number;
       };
     };
   };
@@ -61,37 +69,34 @@ export async function POST(request: Request) {
   if (typeof parsedBody !== "object" || parsedBody === null) {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
-  const body = parsedBody as RazorpayPaymentLinkPaidPayload;
+  const body = parsedBody as RazorpayOrderPaidPayload;
 
-  if (body.event !== "payment_link.paid") {
+  if (body.event !== "order.paid") {
     return NextResponse.json({ received: true });
   }
 
-  const paymentLinkId = body.payload.payment_link.entity.id;
   const payment = body.payload.payment.entity;
-  const buyerEmail = payment.email || body.payload.payment_link.entity.customer?.email;
-  const buyerContact = payment.contact || body.payload.payment_link.entity.customer?.contact;
+  const buyerEmail = payment.email;
+  const buyerContact = payment.contact;
 
   const payloadClient = await getPayloadClient();
 
   const { docs: products } = await payloadClient.find({
     collection: "products",
-    where: { razorpayPaymentLinkId: { equals: paymentLinkId } },
+    where: { slug: { equals: AI_CASHFLOW_SLUG } },
     limit: 1,
   });
   const product = products[0];
   if (!product) {
-    console.error("[webhooks/razorpay] No product found for payment link:", paymentLinkId);
+    console.error("[webhooks/razorpay] AI Cashflow product not found in Payload");
     return NextResponse.json({ received: true });
   }
 
-  // razorpayPaymentLinkId is reusable across products, but everything downstream of
-  // here (the PDF, the email copy, the success-page link) is AI Cashflow specific —
-  // so refuse to deliver rather than send the wrong product to a future buyer.
-  if (product.slug !== AI_CASHFLOW_SLUG) {
+  const expectedAmount = (product.price ?? 0) * 100;
+  if (payment.amount !== expectedAmount) {
     console.error(
-      "[webhooks/razorpay] Payment link maps to an unsupported product, skipping delivery:",
-      product.slug,
+      "[webhooks/razorpay] Paid amount doesn't match AI Cashflow's price, skipping delivery:",
+      { paid: payment.amount, expected: expectedAmount, paymentId: payment.id },
     );
     return NextResponse.json({ received: true });
   }
@@ -117,7 +122,9 @@ export async function POST(request: Request) {
       collection: "orders",
       data: {
         razorpayPaymentId: payment.id,
-        razorpayPaymentLinkId: paymentLinkId,
+        // No Payment Page ID exists in this payload (see note above) — the
+        // Razorpay Order ID is stored here instead, for traceability only.
+        razorpayPaymentLinkId: body.payload.order.entity.id,
         product: product.id,
         amount: payment.amount,
         currency: payment.currency,
