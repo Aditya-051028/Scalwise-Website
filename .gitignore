@@ -44,6 +44,10 @@ yarn-error.log*
 # a one-off seed step instead.
 /media/
 
+# Private, non-public assets (e.g. paid product PDFs) — never committed to
+# this public repo. Placed on each environment out-of-band.
+/private/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
