@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
 import { getPayloadClient } from "@/lib/payload";
 import { signDownloadToken } from "@/lib/download-token";
-import { sendPurchaseConfirmation } from "@/lib/email";
+import { sendPurchaseConfirmation, sendOrderDeliveryAlert } from "@/lib/email";
+import { AI_CASHFLOW_SLUG } from "@/lib/content/ai-cashflow";
 import type { RequiredDataFromCollectionSlug } from "payload";
 import type { Order } from "@/payload-types";
 
@@ -51,12 +52,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
-  let body: RazorpayPaymentLinkPaidPayload;
+  let parsedBody: unknown;
   try {
-    body = JSON.parse(rawBody);
+    parsedBody = JSON.parse(rawBody);
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
+  if (typeof parsedBody !== "object" || parsedBody === null) {
+    return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
+  }
+  const body = parsedBody as RazorpayPaymentLinkPaidPayload;
 
   if (body.event !== "payment_link.paid") {
     return NextResponse.json({ received: true });
@@ -80,6 +85,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ received: true });
   }
 
+  // razorpayPaymentLinkId is reusable across products, but everything downstream of
+  // here (the PDF, the email copy, the success-page link) is AI Cashflow specific —
+  // so refuse to deliver rather than send the wrong product to a future buyer.
+  if (product.slug !== AI_CASHFLOW_SLUG) {
+    console.error(
+      "[webhooks/razorpay] Payment link maps to an unsupported product, skipping delivery:",
+      product.slug,
+    );
+    return NextResponse.json({ received: true });
+  }
+
   const { docs: existingOrders } = await payloadClient.find({
     collection: "orders",
     where: { razorpayPaymentId: { equals: payment.id } },
@@ -89,22 +105,45 @@ export async function POST(request: Request) {
     return NextResponse.json({ received: true });
   }
 
-  const order = (await payloadClient.create({
-    collection: "orders",
-    data: {
-      razorpayPaymentId: payment.id,
-      razorpayPaymentLinkId: paymentLinkId,
-      product: product.id,
-      amount: payment.amount,
-      currency: payment.currency,
-      buyerEmail,
-      buyerContact,
-      rawPayload: body,
-    } as RequiredDataFromCollectionSlug<"orders">,
-    overrideAccess: true,
-  })) as Order;
+  // The idempotency check above already passed, so a throw anywhere between here and
+  // the minted token would leave Razorpay's retry seeing an existing Order and exiting
+  // early — the buyer's email would then never be attempted again. Swallow the failure
+  // into a 200 (a retry can't fix an unset secret or a rejected row anyway) and make it
+  // an admin's problem instead of a silent one.
+  let order: Order;
+  let token: string;
+  try {
+    order = (await payloadClient.create({
+      collection: "orders",
+      data: {
+        razorpayPaymentId: payment.id,
+        razorpayPaymentLinkId: paymentLinkId,
+        product: product.id,
+        amount: payment.amount,
+        currency: payment.currency,
+        buyerEmail,
+        buyerContact,
+        rawPayload: body,
+      } as RequiredDataFromCollectionSlug<"orders">,
+      overrideAccess: true,
+    })) as Order;
 
-  const token = signDownloadToken(String(order.id));
+    token = signDownloadToken(String(order.id));
+  } catch (err) {
+    console.error(
+      "[webhooks/razorpay] Failed to record the order or mint its download token for payment:",
+      payment.id,
+      err,
+    );
+    sendOrderDeliveryAlert({
+      reason: "Recording the order or minting its download token failed; no email was sent.",
+      razorpayPaymentId: payment.id,
+    }).catch((alertErr) =>
+      console.error("[webhooks/razorpay] admin alert failed:", alertErr),
+    );
+    return NextResponse.json({ received: true });
+  }
+
   sendPurchaseConfirmation(order, token).catch((err) =>
     console.error("[webhooks/razorpay] confirmation email failed:", err),
   );

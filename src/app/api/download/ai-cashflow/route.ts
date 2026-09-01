@@ -16,9 +16,12 @@ export async function GET(request: Request) {
   const token = url.searchParams.get("token") || "";
   const verified = verifyDownloadToken(token);
 
+  // The success page's "we couldn't confirm an order here" state (no token, so it
+  // falls through to exactly that) already explains this and offers a Contact CTA —
+  // better than dropping the buyer back on the sales page with no explanation.
   if (!verified) {
     return NextResponse.redirect(
-      new URL("/products/ai-cashflow?downloadExpired=true", request.url),
+      new URL("/products/ai-cashflow/success", request.url),
     );
   }
 
